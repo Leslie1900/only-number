@@ -1,0 +1,50 @@
+{
+  "name": "@leslie1900/only-number",
+  "version": "1.0.0",
+  "description": "A Vue 3 directive to restrict input to numbers with customizable precision, min, max limits, and formatting.",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "npx tsup",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "vue",
+    "vue3",
+    "directive",
+    "only-number",
+    "input",
+    "number-only",
+    "el-input",
+    "format"
+  ],
+  "author": "",
+  "license": "MIT",
+  "peerDependencies": {
+    "vue": "^3.0.0",
+    "element-plus": "^2.0.0"
+  },
+  "peerDependenciesMeta": {
+    "element-plus": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "tsup": "^8.0.2",
+    "typescript": "^5.3.3",
+    "vue": "^3.4.15",
+    "element-plus": "^2.5.2"
+  }
+}
