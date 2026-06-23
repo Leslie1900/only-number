@@ -75,3 +75,30 @@ const listenersMap = new WeakMap<Element, OnlyNumberListeners>()
 4. **初始化与外部数据流更新（Init & Updated）**：
    - **挂载时（`mounted`）**：在指令挂载时，如果输入框有初始值（不论是数字、纯数字字符串，还是带千分位的字符串），若当前处于未聚焦状态，则在初始化时进行一次格式化，确保首屏渲染出美观的千分位。
    - **动态更新时（`updated`）**：如果后端在异步请求完成后更改了绑定的数据（导致 `updated` 被触发），如果输入框没有被聚焦，则会重新清洗该数值并再次转化为规范的千分位字符串。通过判断 `curValue !== sanitized`，成功阻断了因为 `setVal` 重新派发事件引发的 Vue 重新渲染死循环。
+
+---
+
+## 5. 千分位格式化下 v-model 绑定值的纯数字设计 (Clean V-Model Value with Thousands)
+
+### 痛点
+当开启千分位格式化后，输入框内容变为 `1,234.56`。如果将带逗号的字符串直接同步回 `v-model` 绑定的变量，可能会产生以下弊端：
+1. 业务逻辑在处理该值（如提交到后端、进行数学运算等）时需要手动清洗逗号。
+2. 常见的数字转换（如 `Number('1,234.56')` 或 `+value`）会解析出 `NaN`，从而引发前端逻辑报错。
+
+### 解决方案
+在 `setVal` 方法中分离 **DOM 呈现值** 与 **Vue 双向绑定值** 的传递：
+1. **生成纯净值**：通过 `const emitValue = binding.thousands ? value.replace(/,/g, '') : value` 生成去除了所有逗号的纯数字字符串作为传递值。
+2. **更新组件状态**：对于 Vue 组件，通过 `vnode.component.emit('update:modelValue', emitValue)` 直接派发纯数字值。
+3. **触发 input 事件**：对于原生 input 或者兼容原生机制的组件，在触发 `input` 事件前临时将 `input.value` 切换为 `emitValue`，触发事件完毕后再恢复为带有千分位的展示值。这确保了事件气泡向上传递时携带的是纯净的数值：
+   ```typescript
+   if (binding.thousands) {
+     const originalValue = target.value
+     target.value = emitValue
+     target.dispatchEvent(new Event('input', { bubbles: true }))
+     target.value = originalValue
+   } else {
+     target.dispatchEvent(new Event('input', { bubbles: true }))
+   }
+   ```
+这套设计完美实现了“所见即所想”——**用户在界面上看到的是易读的千分位金融格式，而开发者在代码中拿到的始终是干净可直接计算的纯数字字符串**。
+
