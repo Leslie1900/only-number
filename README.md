@@ -86,7 +86,7 @@ import { onlyNumberDirective as vOnlyNumber } from '@leslie1900/only-number'
 | `maxText` | `string` | `-` | 超出最大值限制时的提示文本，将传给 `messageHandler` 进行展示。 |
 | `minText` | `string` | `-` | 低于最小值限制时的提示文本，将传给 `messageHandler` 进行展示。 |
 | `messageHandler` | `(msg: string) => void` | `-` | 指令级别的消息提示句柄，若不传，则回退到全局 `messageHandler`，或尝试使用 Element Plus，或降级到 `console.warn`。 |
-| `thousands` | `boolean` | `false` | 是否开启千分位格式化。开启后，失焦（blur）时内容格式化为千分位形式（如 `1,234,567.89`），聚焦（focus）时剥离逗号方便编辑。*注意：v-model 绑定的值在失焦时也会同步为带逗号的字符串。* |
+| `thousands` | `boolean` | `false` | 是否开启千分位格式化。开启后，失焦（blur）时内容格式化为千分位形式（如 `1,234,567.89`），聚焦（focus）时剥离逗号方便编辑。*注意：v-model 绑定的值始终保持为去除了逗号的纯数字字符串，避免转换数字时出现 NaN 的问题。* |
 
 ---
 
